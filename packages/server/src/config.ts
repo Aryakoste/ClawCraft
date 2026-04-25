@@ -1,0 +1,71 @@
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
+import { homedir } from 'os'
+import { join } from 'path'
+
+export interface ClawcraftConfig {
+  openclawSkillsPath: string
+  llmProvider: 'anthropic' | 'openai' | 'openai-compat' | 'ollama' | 'openclaw'
+  apiKey: string
+  model: string
+  baseUrl?: string
+  port: number
+  theme: 'dark' | 'light'
+  autoScan: boolean
+  version: string
+}
+
+const CONFIG_DIR = join(homedir(), '.clawcraft')
+const CONFIG_PATH = join(CONFIG_DIR, 'config.json')
+const HISTORY_DIR = join(CONFIG_DIR, 'history')
+const USAGE_DIR = join(CONFIG_DIR, 'usage')
+
+export function ensureConfigDir(): void {
+  if (!existsSync(CONFIG_DIR)) mkdirSync(CONFIG_DIR, { recursive: true })
+  if (!existsSync(HISTORY_DIR)) mkdirSync(HISTORY_DIR, { recursive: true })
+  if (!existsSync(USAGE_DIR)) mkdirSync(USAGE_DIR, { recursive: true })
+}
+
+const DEFAULTS: ClawcraftConfig = {
+  openclawSkillsPath: join(homedir(), '.openclaw', 'skills'),
+  llmProvider: 'anthropic',
+  apiKey: '',
+  model: 'claude-sonnet-4-6',
+  port: 4000,
+  theme: 'dark',
+  autoScan: true,
+  version: '1.0.0',
+}
+
+export function readConfig(): ClawcraftConfig {
+  ensureConfigDir()
+  if (!existsSync(CONFIG_PATH)) return { ...DEFAULTS }
+  try {
+    const raw = readFileSync(CONFIG_PATH, 'utf-8')
+    return { ...DEFAULTS, ...JSON.parse(raw) }
+  } catch {
+    return { ...DEFAULTS }
+  }
+}
+
+export function writeConfig(config: Partial<ClawcraftConfig>): ClawcraftConfig {
+  ensureConfigDir()
+  const current = readConfig()
+  const updated = { ...current, ...config }
+  writeFileSync(CONFIG_PATH, JSON.stringify(updated, null, 2), 'utf-8')
+  return updated
+}
+
+export function getHistoryDir(): string {
+  ensureConfigDir()
+  return HISTORY_DIR
+}
+
+export function getUsageDir(): string {
+  ensureConfigDir()
+  return USAGE_DIR
+}
+
+export function getConfigDir(): string {
+  ensureConfigDir()
+  return CONFIG_DIR
+}

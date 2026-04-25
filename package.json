@@ -1,0 +1,39 @@
+{
+  "name": "clawcraft",
+  "version": "1.0.0",
+  "description": "A local visual studio for OpenClaw skills — build, scan, debug, and manage skills without touching code.",
+  "bin": {
+    "clawcraft": "./bin/clawcraft.js"
+  },
+  "workspaces": [
+    "packages/server",
+    "packages/client"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w packages/server\" \"npm run dev -w packages/client\"",
+    "build": "npm run build -w packages/client && npm run build -w packages/server",
+    "start": "node bin/clawcraft.js start",
+    "prepare": "npm run build"
+  },
+  "keywords": ["openclaw", "skills", "ai", "automation", "nocode"],
+  "author": "Clawcraft",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "adm-zip": "^0.5.16",
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "open": "^10.1.0",
+    "openai": "^4.80.0"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.7",
+    "@types/node": "^22.13.0",
+    "concurrently": "^9.1.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
